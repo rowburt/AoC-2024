@@ -1,0 +1,8 @@
+# Exclude cache files
+/.gradle
+/.idea
+/.kotlin
+/*/build
+
+# Exclude AoC puzzle input
+/*/input.txt
