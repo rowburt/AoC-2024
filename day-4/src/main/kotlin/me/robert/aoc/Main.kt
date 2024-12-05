@@ -2,9 +2,10 @@ package me.robert.aoc
 
 import java.io.File
 import kotlin.sequences.toList
+import kotlin.math.floor
 
-/** The word we are searching for */
-const val QUERY = "XMAS"
+const val PART_ONE_QUERY = "XMAS"
+const val PART_TWO_QUERY = "MAS"
 
 fun Pair<Int, Int>.add(other: Pair<Int, Int>) =
         Pair(this.first + other.first, this.second + other.second)
@@ -17,7 +18,22 @@ enum class Direction(val offset: Pair<Int, Int>) {
     Right(Pair(1, 0)),
     DownLeft(Pair(-1, 1)),
     Down(Pair(0, 1)),
-    DownRight(Pair(1, 1))
+    DownRight(Pair(1, 1));
+
+    companion object {
+        val DIAGONALS = listOf(UpLeft, UpRight, DownLeft, DownRight)
+    }
+
+    fun opposite() = when(this) {
+        UpLeft -> DownRight
+        Up -> Down
+        UpRight -> DownLeft
+        Left -> Right
+        Right -> Left
+        DownLeft -> UpRight
+        Down -> Up
+        DownRight -> UpLeft
+    }
 }
 
 data class Tile private constructor(val character: Char, val position: Pair<Int, Int>) {
@@ -56,14 +72,29 @@ data class Tile private constructor(val character: Char, val position: Pair<Int,
         // Do a word search in every direction
         for (direction in Direction.values()) {
             // Add to matches if a match wa.s found in this direction
-            if (!checkFollowing(word, 0, direction)) continue
+            if (!checkFollowing(word, direction)) continue
             matches += direction
         }
 
         return matches.toList()
     }
 
-    private fun checkFollowing(word: String, offset: Int, direction: Direction): Boolean {
+    fun visitX(word: String): Boolean {
+        if (word.length != 3) return false
+
+        // Check if this tile contains the middle character of the word we are searching
+        if(character != word.get(floor(word.length / 2.0).toInt())) return false
+
+        // Check diagonal of each corner bordering this tile
+        val diagonals = Direction.DIAGONALS.filter {
+            val tile = bordering[it.ordinal] ?: return false
+            return@filter tile.checkFollowing(word, it.opposite())
+        }
+
+        return diagonals.size == 2
+    }
+
+    private fun checkFollowing(word: String, direction: Direction): Boolean {
         // Check whether we are the expected character
         if (word.firstOrNull() != character) return false
 
@@ -72,7 +103,7 @@ data class Tile private constructor(val character: Char, val position: Pair<Int,
 
         // Keep recursing in the direction we are searching
         val next = bordering[direction.ordinal] ?: return false
-        return next.checkFollowing(word.substring(1), offset + 1, direction)
+        return next.checkFollowing(word.substring(1), direction)
     }
 }
 
@@ -81,8 +112,12 @@ fun main() {
             File("input.txt").readText().lines().map(CharSequence::toMutableList).toMutableList()
     val tiles = Tile.buildMap(contents)
 
-    println("Amount of $QUERY matches: ${partOne(tiles)}")
+    println("Amount of $PART_ONE_QUERY matches: ${partOne(tiles)}")
+    println("Amount of $PART_TWO_QUERY crosses: ${partTwo(tiles)}")
 }
 
 fun partOne(tiles: List<Tile>) =
-    tiles.sumOf { return@sumOf it.visit(QUERY).size }
+    tiles.sumOf { return@sumOf it.visit(PART_ONE_QUERY).size }
+
+fun partTwo(tiles: List<Tile>) =
+    tiles.count { return@count it.visitX(PART_TWO_QUERY) }
