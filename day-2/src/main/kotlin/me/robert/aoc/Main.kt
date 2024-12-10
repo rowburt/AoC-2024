@@ -7,10 +7,9 @@ typealias Report = List<Int>
 
 fun main() {
     // Load reports from file
-    val reports =
-            File("input.txt").readLines().map {
-                return@map it.split(" ").map(String::toInt)
-            }
+    val reports = File("input.txt").readLines().map {
+        return@map it.split(" ").map(String::toInt)
+    }
 
     println("Amount of safe reports: ${partOne(reports)}")
     println("Amount of safe reports: ${partTwo(reports)}")

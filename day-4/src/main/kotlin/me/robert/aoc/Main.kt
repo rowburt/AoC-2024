@@ -108,8 +108,7 @@ data class Tile private constructor(val character: Char, val position: Pair<Int,
 }
 
 fun main() {
-    val contents =
-            File("input.txt").readText().lines().map(CharSequence::toMutableList).toMutableList()
+    val contents = File("input.txt").readText().lines().map(CharSequence::toMutableList).toMutableList()
     val tiles = Tile.buildMap(contents)
 
     println("Amount of $PART_ONE_QUERY matches: ${partOne(tiles)}")

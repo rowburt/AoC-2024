@@ -27,11 +27,7 @@ fun partOne(keys: List<Int>, values: List<Int>): Int {
     return sum
 }
 
-fun partTwo(keys: List<Int>, values: List<Int>): Int {
-    var similarity = 0
-    
-    // Calculate the similarity of the lists based on the amount of times the key appears in the values list
-    for (key in keys)
-        similarity += key * values.count({it == key})
-    return similarity
+// Calculate the similarity of the lists based on the amount of times the key appears in the values list
+fun partTwo(keys: List<Int>, values: List<Int>) = keys.sumOf { key ->
+    return@sumOf key * values.count { it == key }
 }
