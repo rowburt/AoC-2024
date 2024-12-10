@@ -65,8 +65,7 @@ fun tick(guardPos: Pos, map: Map): Map {
     if(!next.isInBounds(mutable)) return mutable.toList()
 
     if (mutable.get(next) == BLOCKADE) {
-        val nextGuard = guard.next()
-        mutable.set(guardPos.add(nextGuard.offset), nextGuard.character)
+        mutable.set(guardPos, guard.next().character)
         return mutable.toList()
     }
 
