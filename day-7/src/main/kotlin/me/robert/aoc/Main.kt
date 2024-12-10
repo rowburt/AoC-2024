@@ -8,8 +8,8 @@ typealias Solution = List<Operator>
 
 data class Test(val expected: Long, val inputs: Inputs)
 
-fun Solution.compute(inputs: Inputs): Long? {
-    if (this.size != inputs.size - 1) return null
+fun Solution.compute(inputs: Inputs): Long {
+    if (this.size != inputs.size - 1) throw Exception("Illegal input length for solution (${inputs.size} != ${this.size})")
     var sum = inputs[0]
 
     for (i in 1 until inputs.size) {
@@ -39,7 +39,15 @@ fun main() {
 
 fun solve(test: Test, allowed: List<Operator>, solution: Solution): Solution? {
     if (solution.size == test.inputs.size - 1) {
-        return if (solution.compute(test.inputs) == test.expected) solution else null
+        val computed = solution.compute(test.inputs)
+        return if (computed == test.expected) solution else null
+    }
+    
+    // Return early if the goal score can no longer be reached
+    if(solution.isNotEmpty()) {
+        val inputs = test.inputs.take(solution.size + 1)
+        val computed = solution.compute(inputs)
+        if(computed > test.expected) return null
     }
 
     for (op in allowed) {
